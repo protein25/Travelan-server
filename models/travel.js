@@ -2,20 +2,19 @@ const Sequelize = require('sequelize');
 const sequelize = require('./database');
 var members = require('./members');
 
-const  = sequelize.define('device',{
+const  = sequelize.define('travel',{
   memberId:{
-    type:Sequelize.INTAGER,
+    type:Sequelize.INTAGER
+    allowNull:false,
     references:{
       model:members,
       key:'id'
     }
   },
-  deviceId:{
-    type:Sequelize.STRING
-  },
-  lastLocation:{
-    type:Sequelize.STRING
+  title:{
+    type: Sequelize.STRING,
+    allowNull:false
   }
 });
 
-module.exports = device;
+module.exports = travel;

@@ -14,8 +14,8 @@ const  = sequelize.define('transportation',{
   time:{
     type:Sequelize.STRING
   },
-  planId:{
-    type:Sequelize.INTEGER
+  route:{
+    type:Sequelize.TEXT
   }
 });
 

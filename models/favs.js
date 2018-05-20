@@ -1,9 +1,9 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
-var models = require('./members');
+var members =require(./members);
 var newspeed = require('./newspeed');
 
-const  = sequelize.define('comment',{
+const  = sequelize.define('favs',{
   memberId:{
     type:Sequelize.INTAGER,
     allowNull:false,
@@ -19,11 +19,7 @@ const  = sequelize.define('comment',{
       model:newspeed,
       key:'id'
     }
-  },
-  content:{
-    type:Sequelize.TEXT,
-    allowNull:false
   }
 });
 
-module.exports = comment;
+module.exports = favs;

@@ -10,9 +10,6 @@ const  = sequelize.define('accommodate',{
   },
   tel:{
     type:Sequelize.STRING
-  },
-  planId:{
-    type:Sequelize.INTEGER
   }
 });
 

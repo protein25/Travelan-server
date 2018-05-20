@@ -1,9 +1,15 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
+var members = require('./members');
 
-const  = sequelize.define('newspeed',{
+const newspeed = sequelize.define('newspeed',{
   memberId:{
-    type:Sequelize.STRING
+    type:Sequelize.STRING,
+    allowNull:false,
+    references:{
+      model:members,
+      key:'id'
+    }
   },
   content:{
     type:Sequelize.TEXT

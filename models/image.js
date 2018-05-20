@@ -1,17 +1,8 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
-var models = require('./members');
 var newspeed = require('./newspeed');
 
-const  = sequelize.define('comment',{
-  memberId:{
-    type:Sequelize.INTAGER,
-    allowNull:false,
-    references:{
-      model:members,
-      key:'id'
-    }
-  },
+const image = sequelize.define('image',{
   newspeedId:{
     type:Sequelize.INTAGER,
     allowNull:false,
@@ -20,10 +11,14 @@ const  = sequelize.define('comment',{
       key:'id'
     }
   },
-  content:{
-    type:Sequelize.TEXT,
+  originName:{
+    type:Sequelize.STRING,
+    allowNull:false
+  },
+  serverName:{
+    type:Sequelize.STRING,
     allowNull:false
   }
 });
 
-module.exports = comment;
+module.exports = image;
