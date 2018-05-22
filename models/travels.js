@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('./database');
 var members = require('./members');
 
-const travel = sequelize.define('travel',{
+const travels = sequelize.define('travels',{
   memberId:{
     type:Sequelize.INTEGER,
     allowNull:false,
@@ -17,4 +17,4 @@ const travel = sequelize.define('travel',{
   }
 });
 
-module.exports = travel;
+module.exports = travels;

@@ -111,32 +111,83 @@ router.post('/addFavs',function(req,res,next){
   }).then((result)=>{
     res.send(result);
   }).catch(next);
-
 });
 
-//내가 쓴 newspeed 삭제하기
-router.post('/deleteNewspeed',function(req,res,next){
+//즐겨찾기 삭제하기
+router.post('/delFavs',function(req,res,next){
   var newspeedId = req.body.newspeedId;
 
-  newspeed.destroy({
+  favs.destroy({
     where:{
-      id:newspeedId
+      newspeedId
     }
-  });
+  })
+.then(()=>{
+  res.send('success');
+})
+.catch(next)
+});
+
+//newsfeed 작성하기
+//imageUrl 수정하기
+router.post('/write',function(req,res,next){
+  var memberId = req.body.memberId;
+  var content = req.body.content;
+  var planId = req.body.planId;
+  var imageUrl = req.body.imageUrl;
+
+  newspeed.create({
+    memberId,
+    content,
+    planId
+  })
+  .then((result)=>{
+    return image.create({
+      newspeedId: result.id,
+      originName: imageUrl,
+      serverName: 'dummydata'
+    });
+  })
+  .then(() => {
+    res.send('success');
+  })
+  .catch(next);
+});
+
+//내가 쓴 newspeed 삭제하기 state:1->true, 0->false
+router.post('/delete',function(req,res,next){
+  var newspeedId = req.body.newspeedId;
+
+  newspeed.update({
+    state:0
+    ,{
+      where:{
+        id:newspeedId
+      }
+    }
+  }).then(()=>{
+    res.send('success');
+  })
+  .catch(next);
 });
 
 
 //내가 쓴 NEWSPEED 수정하기
-router.post('/editNewspeed',function(req,res,next){
+router.post('/edit',function(req,res,next){
   var newspeedId = req.body.newspeedId;
   var content = req.bodt.content;
 
   newspeed.update({
     content,
+  }, {
     where:{
       id:newspeedId
     }
-  });
+  })
+  .then(() => {
+    res.send('success');
+  })
+  .catch(next);
 });
 
 module.exports = router;

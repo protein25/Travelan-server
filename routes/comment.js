@@ -6,11 +6,11 @@ var router = express.Router();
 router.get('/:id([0-9])', (req, res, next) => {
   var newspeedId = req.params.id;
 
-  comment.findAll(
+  comment.findAll({
     where:{
       newspeedId:newspeedId
     }
-  )
+  })
     .then((result) => {
       if (!result) throw Error('NO COMMENT');
       res.send(result);
@@ -37,14 +37,14 @@ router.post('/addComment',function(req,res,next){
 router.post('/deleteComment'function(req,res,next){
   var id = req.body.id;
 
-  comment.destroy(
+  comment.destroy({
     where:{
       id = id
-    })
-    .then(function(result){
-      res.send(result);
-    });
-
+    }
+  })
+    .then(function(){
+      res.send('success');
+    }).catch(nxt);
 });
 
 //댓글 수정
@@ -52,14 +52,15 @@ router.post('/editComment',function(){
   var id = req.body.id;
   var content = req.body.content;
 
-  comment.update(
-    content = content;
+  comment.update({
+    content,
+  },{
     where:{
       id:id
     }
-  ).then(function(result){
-    res.send(result);
-  });
+  }).then(function(){
+    res.send('success');
+  }).catch(next);
 });
 
 module.exports = router;

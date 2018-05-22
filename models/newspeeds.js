@@ -10,7 +10,8 @@ const options = {
       include:[{
       model:image,
         where:{
-          newspeedId:Sequelize.col('newspeed.id')
+          newspeedId:Sequelize.col('newspeed.id'),
+          state:1
         },
       }],
     }),
@@ -31,6 +32,10 @@ const newspeed = sequelize.define('newspeed',{
   },
   planId:{
     type:Sequelize.INTEGER
+  },
+  state:{
+    type:Sequelize.INTEGER,
+    allowNull:false
   }
 }, options);
 
