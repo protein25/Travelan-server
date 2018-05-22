@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('./database');
 var members = require('./members');
 
-const  = sequelize.define('plan',{
+const plan = sequelize.define('plan',{
   memberId:{
     type:Sequelize.STRING,
     allowNull:false,
@@ -12,21 +12,21 @@ const  = sequelize.define('plan',{
     }
   },
   titleId:{
-    type: Sequelize.INTAGER,
+    type: Sequelize.INTEGER,
     allowNull:false
   },
   date:{
     type: Sequelize.DATE
   },
   attribeteType:{
-    type:Sequelize.INTAGER,
+    type:Sequelize.INTEGER,
     allowNull:false
   },
   attributeId:{
-    type: Sequelize.INTAGER
+    type: Sequelize.INTEGER
   },
   order:{
-    type: Sequelize.INTAGER
+    type: Sequelize.INTEGER
   }
 });
 

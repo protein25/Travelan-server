@@ -1,11 +1,11 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
-var members =require(./members);
+var members =require('./members');
 var newspeed = require('./newspeed');
 
-const  = sequelize.define('favs',{
+const favs = sequelize.define('favs',{
   memberId:{
-    type:Sequelize.INTAGER,
+    type:Sequelize.INTEGER,
     allowNull:false,
     references:{
       model:members,
@@ -13,7 +13,7 @@ const  = sequelize.define('favs',{
     }
   },
   newspeedId:{
-    type:Sequelize.INTAGER,
+    type:Sequelize.INTEGER,
     allowNull:false,
     references:{
       model:newspeed,

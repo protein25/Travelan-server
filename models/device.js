@@ -4,7 +4,7 @@ var members = require('./members');
 
 const  = sequelize.define('device',{
   memberId:{
-    type:Sequelize.INTAGER,
+    type:Sequelize.INTEGER,
     references:{
       model:members,
       key:'id'

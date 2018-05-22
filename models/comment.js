@@ -5,7 +5,7 @@ var newspeed = require('./newspeed');
 
 const  = sequelize.define('comment',{
   memberId:{
-    type:Sequelize.INTAGER,
+    type:Sequelize.INTEGER,
     allowNull:false,
     references:{
       model:members,
@@ -13,7 +13,7 @@ const  = sequelize.define('comment',{
     }
   },
   newspeedId:{
-    type:Sequelize.INTAGER,
+    type:Sequelize.INTEGER,
     allowNull:false,
     references:{
       model:newspeed,

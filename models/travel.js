@@ -4,7 +4,7 @@ var members = require('./members');
 
 const  = sequelize.define('travel',{
   memberId:{
-    type:Sequelize.INTAGER
+    type:Sequelize.INTEGER
     allowNull:false,
     references:{
       model:members,

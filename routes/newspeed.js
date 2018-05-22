@@ -1,4 +1,4 @@
-const Sequelize = requier('sequelize');
+const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 var newspeed = require('../models/newspeed');
@@ -11,14 +11,14 @@ var router = express.Router();
 
 //모든 게시글 출력
 router.get('/', (req, res, next) => {
-  newspeed.findAll(
-    include:[
+  newspeed.findAll({
+    include:[{
       model:image,
       where:{
         newspeedId:Sequelize.col('newspeed.id')
       }
-    ]
-  )
+    }]
+  })
     .then((result) => {
       if (!result) throw Error('NO DATA');
       res.send(result);
@@ -27,7 +27,7 @@ router.get('/', (req, res, next) => {
 
 //게시글ID로 게시글 검색하기
 //검색쿼리 질문!
-router.get('/:keyword)', function(req,res,next){
+router.get('/:keyword', function(req,res,next){
   var keyword = req.params.keyword;
 
   newspeed.findOne({
@@ -77,10 +77,11 @@ router.post('/addFavs',function(req,res,next){
 router.post('/deleteNewspeed',function(req,res,next){
   var newspeedId = req.body.newspeedId;
 
-  newspeed.destroy(
+  newspeed.destroy({
     where:{
       id:newspeedId
-    });
+    }
+  });
 });
 
 
@@ -89,12 +90,12 @@ router.post('/editNewspeed',function(req,res,next){
   var newspeedId = req.body.newspeedId;
   var content = req.bodt.content;
 
-  newspeed.update(
-    content = content;
+  newspeed.update({
+    content,
     where:{
       id:newspeedId
     }
-  );
+  });
 });
 
 module.exports = router;
