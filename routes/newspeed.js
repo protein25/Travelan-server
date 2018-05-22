@@ -1,7 +1,9 @@
+const Promise = require('bluebird');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 var newspeed = require('../models/newspeed');
+var travel = require('../models/travel');
 var plan = require('../models/plan');
 var favs = require('../models/favs');
 var image = require('../models/image');
@@ -11,29 +13,68 @@ var router = express.Router();
 
 //모든 게시글 출력
 router.get('/', (req, res, next) => {
-  newspeed.findAll({
-    include:[{
-      model:image,
-      where:{
-        newspeedId:Sequelize.col('newspeed.id')
-      }
-    }]
-  })
+  newspeed.scope('addImage').findAll()
     .then((result) => {
       if (!result) throw Error('NO DATA');
       res.send(result);
-    });
+    }).catch(next);
 });
 
 //게시글ID로 게시글 검색하기
-//검색쿼리 질문!
 router.get('/:keyword', function(req,res,next){
   var keyword = req.params.keyword;
+  var search =  `%${keyword}%`;
 
-  newspeed.findOne({
-    where: {
-      id: id
+  Promise.all([
+    newspeed.scope('addImage').findAll({
+      where: {
+        content: {
+          like: search,
+        }
+      },
+      order: [['createdAt', 'desc']],
+    }),
+    newspeed.scope('addImage').findAll({
+      include: [{
+        model: plan.findAll({
+          include: [{
+            model: travel.findAll({
+              where: {
+                title: {
+                  like: search,
+                }
+              }
+            })
+          }]
+        }),
+        require: true,
+      }],
+      order: [['createdAt', 'desc']],
+    })
+  ])
+  .spread((searchByContent, searchByTravel) => {
+    const mergedResult = [];
+    let contentShift;
+    let travelShift;
+
+    while(searchByContent.length > 0 || searchByTravel.length > 0) {
+      if (!contentShift && searchByContent.length > 0) {
+        contentShift = searchByContent.shift();
+      }
+      if (!travelShift && searchByTravel.length > 0) {
+        travelShift = searchByTravel.shift();
+      }
+
+      if (new Date(contentShift.createdAt) > new Date(travelShift.createdAt)) {
+        mergedResult.push(contentShift);
+        contentShift = null;
+      } else {
+        mergedResult.push(travelShift);
+        travelShift = null;
+      }
     }
+
+    return mergedResult;
   })
   .then(function(result) {
     if (!result) throw Error('NO_RESULT');

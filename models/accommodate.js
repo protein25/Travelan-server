@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
 
-const  = sequelize.define('accommodate',{
+const accommodate = sequelize.define('accommodate',{
   title:{
     type:Sequelize.STRING
   },

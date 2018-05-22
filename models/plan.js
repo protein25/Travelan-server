@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
 var members = require('./members');
+var travel = require('./travel');
 
 const plan = sequelize.define('plan',{
   memberId:{
@@ -29,5 +30,7 @@ const plan = sequelize.define('plan',{
     type: Sequelize.INTEGER
   }
 });
+
+plan.belongsTo(travel);
 
 module.exports = plan;

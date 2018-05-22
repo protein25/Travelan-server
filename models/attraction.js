@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
 
-const  = sequelize.define('attraction',{
+const attraction = sequelize.define('attraction',{
   title:{
     type:Sequelize.STRING
   },

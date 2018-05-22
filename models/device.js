@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('./database');
 var members = require('./members');
 
-const  = sequelize.define('device',{
+const device = sequelize.define('device',{
   memberId:{
     type:Sequelize.INTEGER,
     references:{

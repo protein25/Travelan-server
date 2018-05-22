@@ -3,7 +3,7 @@ const sequelize = require('./database');
 var models = require('./members');
 var newspeed = require('./newspeed');
 
-const  = sequelize.define('comment',{
+const comment = sequelize.define('comment',{
   memberId:{
     type:Sequelize.INTEGER,
     allowNull:false,

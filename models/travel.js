@@ -2,9 +2,9 @@ const Sequelize = require('sequelize');
 const sequelize = require('./database');
 var members = require('./members');
 
-const  = sequelize.define('travel',{
+const travel = sequelize.define('travel',{
   memberId:{
-    type:Sequelize.INTEGER
+    type:Sequelize.INTEGER,
     allowNull:false,
     references:{
       model:members,
