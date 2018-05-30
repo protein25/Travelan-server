@@ -84,8 +84,4 @@ router.post('/join', function(req, res, next) {
   .catch(next);
 });
 
-router.get('/test', (req, res, next) => {
-  res.send('test 2');
-});
-
 module.exports = router;

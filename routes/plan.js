@@ -1,16 +1,18 @@
+const express = require('express');
 const Sequelize = require('sequelize');
 
-var plans = require('../models/plans');
-var transportations = require('../models/transportations');
-var attractions = require('../models/attractions');
-var accommodates = require('../models/accommodates');
+const plans = require('../models/plans');
+const transportations = require('../models/transportations');
+const attractions = require('../models/attractions');
+const accommodates = require('../models/accommodates');
 
-var express = require('express');
-var router = express.Router();
+const kakaoToken = require('../middlewares/kakaoToken');
+
+const router = express.Router();
 
 //사용자의 여행 일정 출력
-router.get('/:id[0-9]',function(req,res,next){
-  var memberId = req.params.id;
+router.get('/:id[0-9]', (req,res,next) => {
+  const memberId = req.params.id;
 
   plans.findAll({
     where:{
@@ -25,7 +27,7 @@ router.get('/:id[0-9]',function(req,res,next){
 });
 
 //travel별 date뽑기
-router.get('/:id[0-9]/dates', function(req, res, next) {
+router.get('/:id[0-9]/dates', (req, res, next) => {
   const titleId = req.params.id;
 
   plans.findAll({
@@ -63,21 +65,13 @@ router.get('/:id[0-9]/:date',function(req,res,next){
 });
 
 //작성하기
-router.post('/write',function(req,res,next){
-  var sort = req.body.sort;
-  var memberId = req.body.memberId;
-  var date = req.body.date;
+router.post('/write', kakaoToken, (req,res,next) => {
+  const { member } = req;
 
-  var titleId = req.body.titleId;
-  var title = req.body.title;
-  var address = req.body.address;
-  var tel = req.body.tel;
-
-  var origin = req.body.origin;
-  var destination = req.body.destination;
-  var way = req.body.way;
-  var route = req.body.route;
-  var time = req.body.time;
+  const {
+    sort, date, titleId, title, address, tel, origin,
+    destination, way, route, time,
+  } = req.body;
 
   Promise.resolve()
     .then(() => {
@@ -89,26 +83,26 @@ router.post('/write',function(req,res,next){
         });
       }
       if (sort === 'attraction') {
-        return accommodates.create({
+        return attractions.create({
           title,
           address,
           tel
         });
       }
-      if (sort === 'transportations') {
-        return accommodates.create({
+      if (sort === 'transportation') {
+        return transportations.create({
           origin,
           destination,
           way,
           route,
           time
         });
-      } 
+      }
     })
     .then((result) => {
       return plan.create({
         date,
-        memberId,
+        member.id,
         titleId: result.id,
         attributeType: sort,
         attributeId: result.id,
