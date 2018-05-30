@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
 
-const  = sequelize.define('transportation',{
+const transportations = sequelize.define('transportations',{
   origin:{
     type:Sequelize.STRING
   },
@@ -19,4 +19,4 @@ const  = sequelize.define('transportation',{
   }
 });
 
-module.exports = transportation;
+module.exports = transportations;

@@ -18,10 +18,10 @@ router.get('/:id[0-9]',function(req,res,next){
     },
     order:[['date','desc']],
   })
-.then((result)=>{
-  res.send(result);
-})
-.catch(next);
+  .then((result)=>{
+    res.send(result);
+  })
+  .catch(next);
 });
 
 //travel별 date뽑기
@@ -47,18 +47,19 @@ router.get('/:id[0-9]/dates', function(req, res, next) {
 router.get('/:id[0-9]/:date',function(req,res,next){
   var titleId = req.params.id;
   var date = req.params.date;
-plan.findAll(
-  where:{
-    titleId,
-    date
-  },
-  order:[['order','asc']],
-)
-.then(
-  if(!result) throw Error('NO_DATA');
-  res.send(result);
-)
-.catch(next);
+
+  plan.findAll({
+    where:{
+      titleId,
+      date
+    },
+    order:[['order','asc']],
+  })
+  .then(() => {
+    if(!result) throw Error('NO_DATA');
+    res.send(result);
+  })
+  .catch(next);
 });
 
 //작성하기
@@ -67,6 +68,7 @@ router.post('/write',function(req,res,next){
   var memberId = req.body.memberId;
   var date = req.body.date;
 
+  var titleId = req.body.titleId;
   var title = req.body.title;
   var address = req.body.address;
   var tel = req.body.tel;
@@ -80,40 +82,39 @@ router.post('/write',function(req,res,next){
   Promise.resolve()
     .then(() => {
       if (sort === 'accommodate') {
-        return accommodates.create(
+        return accommodates.create({
           title,
           address,
           tel
-        );
+        });
       }
       if (sort === 'attraction') {
-        return accommodates.create(
+        return accommodates.create({
           title,
           address,
           tel
-        );
+        });
       }
       if (sort === 'transportations') {
-        return accommodates.create(
+        return accommodates.create({
           origin,
           destination,
           way,
           route,
           time
-        );
-      }
-
+        });
+      } 
     })
-  .then((result) => {
-    return plan.create({
-      memberId,
-
-      attributeType:sort,
-
-
-    });
-  })
-  .catch(next);
+    .then((result) => {
+      return plan.create({
+        date,
+        memberId,
+        titleId: result.id,
+        attributeType: sort,
+        attributeId: result.id,
+      });
+    })
+    .catch(next);
 });
 
 module.exports = router;

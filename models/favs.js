@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
 var members =require('./members');
-var newspeed = require('./newspeed');
+var newspeeds = require('./newspeeds');
 
 const favs = sequelize.define('favs',{
   memberId:{
@@ -16,7 +16,7 @@ const favs = sequelize.define('favs',{
     type:Sequelize.INTEGER,
     allowNull:false,
     references:{
-      model:newspeed,
+      model:newspeeds,
       key:'id'
     }
   }

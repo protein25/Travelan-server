@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
 
-const attraction = sequelize.define('attraction',{
+const attractions = sequelize.define('attractions',{
   title:{
     type:Sequelize.STRING
   },
@@ -13,4 +13,4 @@ const attraction = sequelize.define('attraction',{
   }
 });
 
-module.exports = attraction;
+module.exports = attractions;

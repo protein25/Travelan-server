@@ -2,55 +2,62 @@ const Promise = require('bluebird');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
-var newspeed = require('../models/newspeed');
-var travel = require('../models/travel');
-var plan = require('../models/plan');
+var newspeeds = require('../models/newspeeds');
+var travels = require('../models/travels');
+var plans = require('../models/plans');
 var favs = require('../models/favs');
-var image = require('../models/image');
+var images = require('../models/images');
 
 var express = require('express');
 var router = express.Router();
 
 //모든 게시글 출력
 router.get('/', (req, res, next) => {
-  newspeed.scope('addImage').findAll()
+  newspeeds.scope('addImage')
+    .findAll()
     .then((result) => {
       if (!result) throw Error('NO DATA');
       res.send(result);
-    }).catch(next);
+    })
+    .catch(next);
 });
 
 //게시글ID로 게시글 검색하기
-router.get('/:keyword', function(req,res,next){
-  var keyword = req.params.keyword;
+router.get('/search', (req,res,next) => {
+  var keyword = req.query.keyword;
   var search =  `%${keyword}%`;
 
   Promise.all([
-    newspeed.scope('addImage').findAll({
+    newspeeds.scope('addImage').findAll({
       where: {
         content: {
-          like: search,
+          [Op.like]: search,
         }
       },
       order: [['createdAt', 'desc']],
     }),
-    newspeed.scope('addImage').findAll({
-      include: [{
-        model: plan.findAll({
-          include: [{
-            model: travel.findAll({
-              where: {
-                title: {
-                  like: search,
-                }
-              }
-            })
-          }]
-        }),
-        require: true,
-      }],
-      order: [['createdAt', 'desc']],
+    travels.findAll({
+      attributes: ['id'],
+      where: {
+        title: {
+          [Op.like]: search,
+        },
+      },
     })
+    .then((results) => {
+      const travelIds = results.map((travel) => travel.id);
+      return newspeeds.scope('addImage').findAll({
+        include: [{
+          model: plans,
+          where: {
+            titleId: {
+              [Op.in]: travelIds,
+            },
+          },
+          required: true,
+        }],
+      });
+    }),
   ])
   .spread((searchByContent, searchByTravel) => {
     const mergedResult = [];
@@ -65,10 +72,10 @@ router.get('/:keyword', function(req,res,next){
         travelShift = searchByTravel.shift();
       }
 
-      if (new Date(contentShift.createdAt) > new Date(travelShift.createdAt)) {
+      if (!travelShift || (contentShift && new Date(contentShift.createdAt) > new Date(travelShift.createdAt))) {
         mergedResult.push(contentShift);
         contentShift = null;
-      } else {
+      } else if (travelShift){
         mergedResult.push(travelShift);
         travelShift = null;
       }
@@ -76,7 +83,7 @@ router.get('/:keyword', function(req,res,next){
 
     return mergedResult;
   })
-  .then(function(result) {
+  .then((result) => {
     if (!result) throw Error('NO_RESULT');
 
     res.send(result);
@@ -85,15 +92,15 @@ router.get('/:keyword', function(req,res,next){
 });
 
 //게시글에 연관된 여행일정 출력하기
-router.get('/showPlan/:id([0-9])',function(req,res,next){
+router.get('/showPlan/:id([0-9])', (req,res,next) => {
   var titleId = req.params.id;
 
-  plan.findAll({
+  plans.findAll({
     where:{
-      titleId : titleId
+      titleId,
     }
   })
-  .then(function(result){
+  .then((result) => {
     if (!result) throw Error('NO DATA');
 
     res.send(result);
@@ -101,20 +108,20 @@ router.get('/showPlan/:id([0-9])',function(req,res,next){
 });
 
 //즐겨찾기 추가하기
-router.post('/addFavs',function(req,res,next){
+router.post('/addFavs', (req,res,next) => {
   var memberId = req.body.memberId;
   var newspeedId = req.body.newspeedId;
 
   favs.create({
-    memberId:memberId,
-    newspeedId:newspeedId
-  }).then((result)=>{
+    memberId: memberId,
+    newspeedId: newspeedId
+  }).then((result) => {
     res.send(result);
   }).catch(next);
 });
 
 //즐겨찾기 삭제하기
-router.post('/delFavs',function(req,res,next){
+router.post('/delFavs', (req,res,next) => {
   var newspeedId = req.body.newspeedId;
 
   favs.destroy({
@@ -122,7 +129,7 @@ router.post('/delFavs',function(req,res,next){
       newspeedId
     }
   })
-.then(()=>{
+.then(() => {
   res.send('success');
 })
 .catch(next)
@@ -130,19 +137,20 @@ router.post('/delFavs',function(req,res,next){
 
 //newsfeed 작성하기
 //imageUrl 수정하기
-router.post('/write',function(req,res,next){
+router.post('/write', (req,res,next) => {
   var memberId = req.body.memberId;
   var content = req.body.content;
   var planId = req.body.planId;
   var imageUrl = req.body.imageUrl;
 
-  newspeed.create({
+  newspeeds.create({
     memberId,
     content,
-    planId
+    planId,
+    state: true,
   })
-  .then((result)=>{
-    return image.create({
+  .then((result) => {
+    return images.create({
       newspeedId: result.id,
       originName: imageUrl,
       serverName: 'dummydata'
@@ -155,17 +163,16 @@ router.post('/write',function(req,res,next){
 });
 
 //내가 쓴 newspeed 삭제하기 state:1->true, 0->false
-router.post('/delete',function(req,res,next){
+router.post('/delete', (req,res,next) => {
   var newspeedId = req.body.newspeedId;
 
-  newspeed.update({
-    state:0
-    ,{
-      where:{
-        id:newspeedId
-      }
-    }
-  }).then(()=>{
+  newspeeds.update({
+    state: 0
+  }, {
+    where: {
+      id: newspeedId,
+    },
+  }).then(() => {
     res.send('success');
   })
   .catch(next);
@@ -173,15 +180,15 @@ router.post('/delete',function(req,res,next){
 
 
 //내가 쓴 NEWSPEED 수정하기
-router.post('/edit',function(req,res,next){
+router.post('/edit', (req,res,next) => {
   var newspeedId = req.body.newspeedId;
   var content = req.bodt.content;
 
-  newspeed.update({
+  newspeeds.update({
     content,
   }, {
     where:{
-      id:newspeedId
+      id: newspeedId
     }
   })
   .then(() => {
