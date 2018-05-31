@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
-var newspeed = require('./newspeed');
+var newspeed = require('./newspeeds');
 
-const image = sequelize.define('image',{
+const images = sequelize.define('images',{
   newspeedId:{
     type:Sequelize.INTEGER,
     allowNull:false,
@@ -21,4 +21,4 @@ const image = sequelize.define('image',{
   }
 });
 
-module.exports = image;
+module.exports = images;

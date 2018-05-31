@@ -7,13 +7,12 @@ const members = sequelize.define('members', {
     primaryKey: true,
     autoIncrement:true
   },
+  kakaoId: {
+    type: Sequelize.INTEGER,
+  },
   userId: {
     type: Sequelize.STRING,
     unique:true,
-    allowNull:false
-  },
-  password: {
-    type: Sequelize.STRING,
     allowNull:false
   },
   name: {

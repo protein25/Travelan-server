@@ -1,9 +1,9 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
 var members = require('./members');
-var travel = require('./travel');
+var travels = require('./travels');
 
-const plan = sequelize.define('plan',{
+const plans = sequelize.define('plans',{
   memberId:{
     type:Sequelize.STRING,
     allowNull:false,
@@ -19,7 +19,7 @@ const plan = sequelize.define('plan',{
   date:{
     type: Sequelize.DATE
   },
-  attribeteType:{
+  attributeType:{
     type:Sequelize.INTEGER,
     allowNull:false
   },
@@ -31,6 +31,6 @@ const plan = sequelize.define('plan',{
   }
 });
 
-plan.belongsTo(travel);
+plans.belongsTo(travels, { foreignKey: 'titleId' });
 
-module.exports = plan;
+module.exports = plans;

@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const sequelize = require('./database');
 var members = require('./members');
 
-const device = sequelize.define('device',{
+const devices = sequelize.define('devices',{
   memberId:{
     type:Sequelize.INTEGER,
     references:{
@@ -18,4 +18,4 @@ const device = sequelize.define('device',{
   }
 });
 
-module.exports = device;
+module.exports = devices;

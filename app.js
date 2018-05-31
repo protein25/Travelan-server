@@ -1,16 +1,20 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const cron = require('node-cron');
 
-var indexRouter = require('./routes/index');
-var informationsRouter = require('./routes/informations');
-var usersRouter = require('./routes/users');
-var membersRouter = require('./routes/members');
-var newspeedRouter = require('./routes/newspeed');
+const indexRouter = require('./routes/index');
+const informationsRouter = require('./routes/informations');
+const usersRouter = require('./routes/users');
+const membersRouter = require('./routes/members');
+const newspeedRouter = require('./routes/newspeed');
+const commentRouter = require('./routes/comment');
 
-var app = express();
+const informationCrawl = require('./informationCrawl');
+
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,6 +31,7 @@ app.use('/users', usersRouter);
 app.use('/members',membersRouter);
 app.use('/newspeed',newspeedRouter);
 app.use('/informations',informationsRouter);
+app.use('/comment',commentRouter);
 
 
 // catch 404 and forward to error handler
@@ -43,6 +48,10 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+cron.schedule('0 * * * *', () => {
+  informationCrawl(); // 매 시간 정각 마다 한번씩 신규 글이 있는지 크롤링
 });
 
 module.exports = app;
