@@ -3,7 +3,7 @@ const decode = require('unescape');
 const informationCrawler = require('./utils/informationCrawler');
 const informations = require('./models/informations');
 
-function crawl(targetId, pageNo = 1) {
+function crawl(targetId, pageNo = 1, foundCount = 0) {
   let findTarget = false;
 
   return informationCrawler(pageNo)
@@ -12,6 +12,9 @@ function crawl(targetId, pageNo = 1) {
         findTarget = true;
         return;
       }
+
+      foundCount += 1;
+
       return informations.create({
         dataId: result.id[0],
         title: result.title[0],
@@ -22,8 +25,8 @@ function crawl(targetId, pageNo = 1) {
       });
     }))
     .then(() => {
-      if (findTarget) return;
-      return crawl(targetId, pageNo + 1);
+      if (findTarget) return foundCount;
+      return crawl(targetId, pageNo + 1, foundCount);
     });
 }
 
@@ -33,7 +36,10 @@ module.exports = () => {
   })
   .then((lastInformation) => {
     const targetId = lastInformation.dataId;
-
     crawl(targetId);
+  })
+  .then((foundCount) => {
+    console.log('foundCount', foundCount);
+    return foundCount;
   });
 }

@@ -1,6 +1,8 @@
-var members = require('../models/members');
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const members = require('../models/members');
+const kakaoToken = require('../middlewares/kakaoToken');
+const kakaoApi = require('../utils/kakaoApi');
+const router = express.Router();
 
 router.get('/', (req, res, next) => {
   members.findAll()
@@ -31,7 +33,7 @@ router.get('/', (req, res, next) => {
 });
 
 router.get('/:id([0-9])', function(req,res,next){
-  var id = req.params.id;
+  const id = req.params.id;
 
   members.findOne({
     where: {
@@ -46,42 +48,27 @@ router.get('/:id([0-9])', function(req,res,next){
   .catch(next);
 });
 
-router.post('/login',function(req,res,next){
-  var userId = req.body.userId;
-  var password = req.body.password;
+router.post('/login', kakaoToken, (req, res) => {
+  const { member } = req;
 
-  members.findOne({
-    where: {
-      userId : userId,
-      password : password
-    },
-    limit: 1,
-    order: [['id', 'desc']],
-  })
-    .then(function(result) {
-      if (!result) throw Error('NO_MEMBER');
+  res.send(member);
+});
 
+router.post('/join', (req, res, next) => {
+  const accessToken = req.get('accessToken');
+  const { userId, name, thumb } = req.body;
+
+  kakaoApi.accessToken(accessToken)
+    .then((kakao) => members.create({
+      userId,
+      kakaoId: kakao.id,
+      name,
+      thumb,
+    }))
+    .then((result) => {
       res.send(result);
     })
     .catch(next);
-});
-
-router.post('/join', function(req, res, next) {
-  var userId = req.body.userId;
-  var password = req.body.password;
-  var name = req.body.name;
-  var thumb = req.body.thumb;
-
-  members.create({
-    userId : userId,
-    password : password,
-    name : name,
-    thumb : thumb
-  })
-  .then((result) => {
-    res.send(result);
-  })
-  .catch(next);
 });
 
 module.exports = router;
