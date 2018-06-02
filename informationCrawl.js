@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-const decode = require('unescape');
+const Html4Entities = require('html-entities').Html4Entities;
 const informationCrawler = require('./utils/informationCrawler');
 const informations = require('./models/informations');
 
