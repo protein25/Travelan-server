@@ -1,9 +1,26 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
 
+function makeFlagImage(countryEnName) {
+  return `${countryEnName.toLowerCase().replace(/ /g, '-')}.png`;
+}
+
 const options = {
   defaultScope: {
-    order: [['wrtDt', 'desc']],
+    order: [['wrtDt', 'desc'], ['createdAt', 'asc']],
+  },
+  hooks: {
+    afterFind: (result) => {
+      if (result instanceof Array) {
+        for (var i in result) {
+          result[i].flagImage = makeFlagImage(result[i].countryEnName);
+        }
+      } else {
+        result.flagImage = makeFlagImage(result.countryEnName);
+      }
+
+      return result;
+    },
   },
 }
 
@@ -22,6 +39,9 @@ const informations = sequelize.define('informations', {
     type: Sequelize.STRING
   },
   countryName: {
+    type: Sequelize.STRING
+  },
+  countryEnName: {
     type: Sequelize.STRING
   },
   content: {
