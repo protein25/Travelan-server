@@ -15,8 +15,14 @@ const router = express.Router();
 
 //모든 게시글 출력
 router.get('/', (req, res, next) => {
-  newspeeds.scope('addImage')
-    .findAll()
+  const pageCount = 10;
+  const page = req.query.page || 0;
+
+  newspeeds.scope('addImage', 'addMember')
+    .findAll({
+      offset: page * pageCount,
+      limit: pageCount,
+    })
     .then((result) => {
       if (!result) throw Error('NO DATA');
       res.send(result);

@@ -17,6 +17,11 @@ const options = {
           },
       }],
     }),
+    addMember: () => ({
+      include: [{
+        model: members,
+      }]
+    })
   },
 };
 
@@ -43,5 +48,6 @@ const newspeed = sequelize.define('newspeed', {
 
 newspeed.hasMany(images);
 newspeed.belongsTo(plans);
+newspeed.belongsTo(members);
 
 module.exports = newspeed;

@@ -10,7 +10,7 @@ router.get('/', (req, res, next) => {
   const pageCount = 10;
 
   informations.findAll({
-    offset: page,
+    offset: page * pageCount,
     limit: pageCount,
   })
   .then((result) => {
