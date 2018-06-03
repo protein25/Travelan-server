@@ -15,6 +15,10 @@ function crawl(targetId, pageNo = 1, foundCount = 0) {
         return;
       }
 
+      if (findTarget) {
+        return;
+      }
+
       foundCount += 1;
 
       return informations.create({
@@ -39,7 +43,7 @@ module.exports = () => {
   })
   .then((lastInformation) => {
     const targetId = lastInformation.dataId;
-    crawl(targetId);
+    return crawl(targetId);
   })
   .then((foundCount) => {
     console.log('foundCount', foundCount);

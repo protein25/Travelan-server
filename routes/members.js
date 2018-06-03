@@ -55,7 +55,7 @@ router.post('/login', kakaoToken, (req, res) => {
 });
 
 router.post('/join', (req, res, next) => {
-  const accessToken = req.get('accessToken');
+  const accessToken = req.get('access-token');
   const { userId, name, thumb } = req.body;
 
   kakaoApi.accessToken(accessToken)

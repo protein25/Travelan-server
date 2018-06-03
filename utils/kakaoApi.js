@@ -8,7 +8,7 @@ module.exports = {
     const options = {
       uri: `${HOST}${apiUrl}`,
       headers: {
-        Bearer: accessToken
+        Authorization: `Bearer ${accessToken}`,
       },
       json: true,
     };
