@@ -3,7 +3,6 @@ const Promise = require('bluebird');
 const parseString = require('xml2js').parseString;
 
 module.exports = (xmlString) => new Promise((resolve, reject) => {
-  console.log('xmlString', xmlString);
   parseString(xmlString, { trim: true }, (err, result) => {
     if (err) {
       reject(err);
