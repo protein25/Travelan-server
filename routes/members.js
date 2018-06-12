@@ -32,7 +32,7 @@ router.get('/', (req, res, next) => {
     // ]
 });
 
-router.get('/:id([0-9])', function(req,res,next){
+router.get('/:id([0-9]+)', function(req,res,next){
   const id = req.params.id;
 
   members.findOne({

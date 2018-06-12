@@ -5,7 +5,7 @@ const kakaoToken = require('../middlewares/kakaoToken');
 const router = express.Router();
 
 //댓글 목록 불러오기
-router.get('/:id([0-9])', (req, res, next) => {
+router.get('/:id([0-9]+)', (req, res, next) => {
   const newspeedId = req.params.id;
 
   comments.findAll({

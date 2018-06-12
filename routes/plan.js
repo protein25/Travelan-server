@@ -1,7 +1,10 @@
+const Promise = require('bluebird');
 const express = require('express');
 const Sequelize = require('sequelize');
+const moment = require('moment');
 
-const plans = require('../models/plans');
+const Plans = require('../models/plans');
+const Travels = require('../models/travels');
 const transportations = require('../models/transportations');
 const attractions = require('../models/attractions');
 const accommodates = require('../models/accommodates');
@@ -9,56 +12,43 @@ const accommodates = require('../models/accommodates');
 const kakaoToken = require('../middlewares/kakaoToken');
 
 const router = express.Router();
+const { Op } = Sequelize;
 
 //사용자의 여행 일정 출력
-router.get('/:id[0-9]', (req,res,next) => {
-  const memberId = req.params.id;
+router.get('/:year([0-9]+)/:month([0-9]+)/:day([0-9]+)', kakaoToken, (req,res,next) => {
+  const { member } = req;
+  const { year, month, day } = req.params;
 
-  plans.findAll({
-    where:{
-      memberId
+  Plans.findAll({
+    where: {
+      memberId: member.id,
+      date: `${year}-${month}-${day}`,
     },
-    order:[['date','desc']],
+    order:[['order', 'asc']],
   })
-  .then((result)=>{
-    res.send(result);
-  })
-  .catch(next);
-});
+  .then((plans) => Promise.map(plans, (plan) => {
+    return Promise.resolve()
+      .then(() => {
+        if (plan.attributeType === 'accomodate') {
+          return accommodates.findById(plan.attributeId);
+        }
+        if (plan.attributeType === 'attraction') {
+          return attractions.findById(plan.attributeId);
+        }
+        if (plan.attributeType === 'transportation') {
+          return transportations.findById(plan.attributeId);
+        }
+      })
+      .then((attribute) => {
+        const attributeObject = attribute.get({ plain: true });
+        attributeObject.date = plan.date;
+        attributeObject.order = plan.order;
+        attributeObject.attributeType = plan.attributeType;
 
-//travel별 date뽑기
-router.get('/:id[0-9]/dates', (req, res, next) => {
-  const titleId = req.params.id;
-
-  plans.findAll({
-    attributes: [[Sequelize.fn('distinct', Sequelize.col('date')), 'date']],
-    where:{
-      titleId,
-    }
-  })
-  .then((results) => results.map((result) => { // [{date: '2018-01-01'}, {date: '2018-01-02'}]
-    return result.date;
+        return attributeObject;
+      });
   }))
-  .then((dates) => { // ['2018-01-01', '2018-01-02']
-    res.send(dates);
-  })
-  .catch(next);
-});
-
-//travel별 date별 일정 뽑기
-router.get('/:id[0-9]/:date',function(req,res,next){
-  var titleId = req.params.id;
-  var date = req.params.date;
-
-  plan.findAll({
-    where:{
-      titleId,
-      date
-    },
-    order:[['order','asc']],
-  })
-  .then(() => {
-    if(!result) throw Error('NO_DATA');
+  .then((result) => {
     res.send(result);
   })
   .catch(next);
@@ -102,7 +92,7 @@ router.post('/write', kakaoToken, (req,res,next) => {
     .then((result) => {
       return plan.create({
         date,
-        member.id,
+        memberId: member.id,
         titleId: result.id,
         attributeType: sort,
         attributeId: result.id,

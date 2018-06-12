@@ -100,7 +100,7 @@ router.get('/search', (req,res,next) => {
 });
 
 //게시글에 연관된 여행일정 출력하기
-router.get('/showPlan/:id([0-9])', (req,res,next) => {
+router.get('/showPlan/:id([0-9]+)', (req,res,next) => {
   var titleId = req.params.id;
 
   plans.findAll({

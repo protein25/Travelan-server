@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
-var members = require('./members');
+const members = require('./members');
+const plans = require('./plans');
 
 const travels = sequelize.define('travels',{
   memberId:{

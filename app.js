@@ -11,6 +11,8 @@ const usersRouter = require('./routes/users');
 const membersRouter = require('./routes/members');
 const newspeedRouter = require('./routes/newspeed');
 const commentRouter = require('./routes/comment');
+const planRouter = require('./routes/plan');
+const travelRouter = require('./routes/travel');
 
 const informationCrawl = require('./informationCrawl');
 
@@ -32,7 +34,8 @@ app.use('/members',membersRouter);
 app.use('/newspeed',newspeedRouter);
 app.use('/informations',informationsRouter);
 app.use('/comment',commentRouter);
-
+app.use('/plan',planRouter);
+app.use('/travel',travelRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
