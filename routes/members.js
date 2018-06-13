@@ -58,13 +58,14 @@ router.post('/join', (req, res, next) => {
   const accessToken = req.get('access-token');
   const { userId, name, thumb, age, sex, emergency } = req.body;
 
+  const ageDate = `${age.slice(0, 4)}-${age.slice(4, 6)}-${age.slice(6, 8)}`;
   kakaoApi.accessToken(accessToken)
     .then((kakao) => members.create({
       userId,
       kakaoId: kakao.id,
       name,
       thumb,
-      age,
+      age: ageDate,
       sex,
       emergency
     }))

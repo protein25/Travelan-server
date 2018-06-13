@@ -29,7 +29,7 @@ const members = sequelize.define('members', {
     allowNull:true
   },
   age: {
-    type: Sequelize.Date,
+    type: Sequelize.DATE,
     allowNull:true
   },
   emergency: {
