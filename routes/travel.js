@@ -52,4 +52,18 @@ router.get('/:year([0-9]+)/:month([0-9]+)', kakaoToken, (req,res,next) => {
   .catch(next);
 });
 
+router.post('/', kakaoToken, (req, res, next) => {
+  const { member } = req;
+  const { title } = req.body;
+
+  Travels.create({
+    title,
+    memberId: member.id,
+  })
+  .then((travel) => {
+    res.send(travel);
+  })
+  .catch(next);
+});
+
 module.exports = router;

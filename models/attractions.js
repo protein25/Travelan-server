@@ -8,8 +8,8 @@ const attractions = sequelize.define('attractions',{
   address:{
     type:Sequelize.STRING
   },
-  tel:{
-    type:Sequelize.STRING
+  coordinates: {
+    type:Sequelize.GEOMETRY('POINT'),
   }
 });
 

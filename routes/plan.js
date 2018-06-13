@@ -46,6 +46,7 @@ router.get('/:year([0-9]+)/:month([0-9]+)/:day([0-9]+)', kakaoToken, (req,res,ne
         attributeObject.date = plan.date;
         attributeObject.order = plan.order;
         attributeObject.attributeType = plan.attributeType;
+        attributeObject.travelId = plan.titleId;
 
         return attributeObject;
       });
@@ -61,24 +62,22 @@ router.post('/write', kakaoToken, (req,res,next) => {
   const { member } = req;
 
   const {
-    sort, date, titleId, title, address, tel, origin,
-    destination, way, route, time,
+    sort, date, travelId, title, address, origin,
+    destination, way, route, time, order,
   } = req.body;
 
   Promise.resolve()
     .then(() => {
-      if (sort === 'accommodate') {
+      if (sort === 'accomodate') {
         return accommodates.create({
           title,
           address,
-          tel
         });
       }
       if (sort === 'attraction') {
         return attractions.create({
           title,
           address,
-          tel
         });
       }
       if (sort === 'transportation') {
@@ -92,13 +91,17 @@ router.post('/write', kakaoToken, (req,res,next) => {
       }
     })
     .then((result) => {
-      return plan.create({
+      return Plans.create({
         date,
+        order,
         memberId: member.id,
-        titleId: result.id,
+        titleId: travelId,
         attributeType: sort,
         attributeId: result.id,
       });
+    })
+    .then((result) => {
+      res.send(result);
     })
     .catch(next);
 });
