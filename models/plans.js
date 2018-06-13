@@ -17,18 +17,18 @@ const plans = sequelize.define('plans',{
     allowNull:false
   },
   date:{
-    type: Sequelize.DATE
+    type: Sequelize.DATE,
   },
   attributeType:{
     type:Sequelize.ENUM(['accomodate','attraction','transportation']),
     allowNull:false
   },
   attributeId:{
-    type: Sequelize.INTEGER
+    type: Sequelize.INTEGER,
   },
   order:{
-    type: Sequelize.INTEGER
-  }
+    type: Sequelize.DOUBLE,
+  },
 });
 
 travels.hasMany(plans, { foreignKey: 'titleId' });
