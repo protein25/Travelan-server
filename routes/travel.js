@@ -22,7 +22,9 @@ router.get('/:year([0-9]+)/:month([0-9]+)', kakaoToken, (req,res,next) => {
   const maxDate = moment(minDate).add({ month: 1 }).subtract({ day: 1 }).format('YYYY-MM-DD');
 
   Travels.findAll({
-    memberId: member.id,
+    where: {
+      memberId: member.id,
+    },
     include: [{
       model: Plans,
       where: {
