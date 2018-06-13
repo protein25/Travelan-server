@@ -11,6 +11,8 @@ const accommodates = require('../models/accommodates');
 
 const kakaoToken = require('../middlewares/kakaoToken');
 
+const GoogleApi = require('../utils/googleApi');
+
 const router = express.Router();
 const { Op } = Sequelize;
 
@@ -97,6 +99,16 @@ router.post('/write', kakaoToken, (req,res,next) => {
         attributeType: sort,
         attributeId: result.id,
       });
+    })
+    .catch(next);
+});
+
+router.get("/findLocation", (req, res, next) => {
+  const { keyword } = req.query;
+
+  GoogleApi.place(keyword)
+    .then((results) => {
+      res.send(results);
     })
     .catch(next);
 });

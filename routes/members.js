@@ -4,32 +4,8 @@ const kakaoToken = require('../middlewares/kakaoToken');
 const kakaoApi = require('../utils/kakaoApi');
 const router = express.Router();
 
-router.get('/', (req, res, next) => {
-  members.findAll()
-    .then((result) => {
-      res.send(result);
-    });
-
-    // [
-    //   {
-    //       "id": 1,
-    //       "password": "tkddms5805",
-    //       "name": "상은",
-    //       "userId": "tkddms1015",
-    //       "thumb": "sdfasg",
-    //       "createdAt": "2018-05-14T00:00:00.000Z",
-    //       "updatedAt": "2018-05-14T00:00:00.000Z"
-    //   },
-    //   {
-    //       "id": 2,
-    //       "password": "choi0245",
-    //       "name": "kyubum",
-    //       "userId": "kyubum",
-    //       "thumb": "dkstkddmsWKd",
-    //       "createdAt": "2018-05-14T13:19:54.000Z",
-    //       "updatedAt": "2018-05-14T13:19:54.000Z"
-    //   }
-    // ]
+router.get('/', kakaoToken, (req, res, next) => {
+  res.send(req.member);
 });
 
 router.get('/:id([0-9]+)', function(req,res,next){
