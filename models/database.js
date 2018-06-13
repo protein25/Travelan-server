@@ -4,6 +4,7 @@ const sequelize = new Sequelize('travelan', 'kyubum', 'choi0245@', {
   host: 'kyubum.me',
   dialect: 'mysql',
   operatorsAliases: false,
+  timezone: '+09:00',
 
   pool: {
     max: 5,

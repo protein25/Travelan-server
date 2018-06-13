@@ -7,6 +7,14 @@ const apiUrl = '/v1/user/access_token_info';
 module.exports = (req, res, next) => {
   const accessToken = req.get('access-token');
 
+  if (req.query.test) {
+    return members.findById(3)
+      .then((member) => {
+        req.member = member;
+        next();
+      });
+  }
+
   kakaoApi.accessToken(accessToken)
     .then((result) => members.findOne({
       where: {

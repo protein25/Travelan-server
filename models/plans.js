@@ -20,7 +20,7 @@ const plans = sequelize.define('plans',{
     type: Sequelize.DATE
   },
   attributeType:{
-    type:Sequelize.INTEGER,
+    type:Sequelize.ENUM(['accomodate','attraction','transportation']),
     allowNull:false
   },
   attributeId:{
@@ -31,6 +31,7 @@ const plans = sequelize.define('plans',{
   }
 });
 
+travels.hasMany(plans, { foreignKey: 'titleId' });
 plans.belongsTo(travels, { foreignKey: 'titleId' });
 
 module.exports = plans;
