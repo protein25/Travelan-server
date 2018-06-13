@@ -9,6 +9,7 @@ const members = sequelize.define('members', {
   },
   kakaoId: {
     type: Sequelize.INTEGER,
+    allowNull:false
   },
   userId: {
     type: Sequelize.STRING,
@@ -20,7 +21,20 @@ const members = sequelize.define('members', {
     allowNull:false
   },
   thumb: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
+    allowNull:true
+  },
+  sex: {
+    type: Sequelize.STRING,
+    allowNull:true
+  },
+  age: {
+    type: Sequelize.Date,
+    allowNull:true
+  },
+  emergency: {
+    type: Sequelize.STRING,
+    allowNull:true
   }
 });
 
