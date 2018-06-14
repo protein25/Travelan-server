@@ -5,11 +5,7 @@ var newspeed = require('./newspeeds');
 const images = sequelize.define('images',{
   newspeedId:{
     type:Sequelize.INTEGER,
-    allowNull:false,
-    references:{
-      model:newspeed,
-      key:'id'
-    }
+    allowNull:false
   },
   originName:{
     type:Sequelize.STRING,

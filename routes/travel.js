@@ -13,6 +13,48 @@ const kakaoToken = require('../middlewares/kakaoToken');
 const router = express.Router();
 const { Op } = Sequelize;
 
+router.get('/', kakaoToken, (req, res, next) => {
+  const { member } = req;
+
+  Travels.findAll({
+    where: {
+      memberId: member.id,
+    },
+    include: [{
+      attribute: ['id', 'date'],
+      model: Plans,
+      required: true,
+    }],
+  })
+  .then((travels) => travels.map((travel) => {
+    const { id, title, plans } = travel;
+
+    let startDate, endDate;
+
+    for (let i in plans) {
+      const planDate = moment(plans[i].date);
+
+      if (!startDate || planDate.isBefore(startDate)) {
+        startDate = planDate;
+      }
+
+      if (!endDate || planDate.isAfter(endDate)) {
+        endDate = planDate;
+      }
+    }
+
+    return {
+      id,
+      title,
+      dateString: `${startDate.format('YYYY-MM-DD')} ~ ${endDate.format('YYYY-MM-DD')}`,
+    }
+  }))
+  .then((results) => {
+    res.send(results);
+  })
+  .catch(next);
+});
+
 //사용자의 여행 일정 출력
 router.get('/:year([0-9]+)/:month([0-9]+)', kakaoToken, (req,res,next) => {
   const { member } = req;

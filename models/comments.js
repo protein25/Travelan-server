@@ -6,19 +6,11 @@ const newspeeds = require('./newspeeds');
 const comments = sequelize.define('comments', {
   memberId:{
     type:Sequelize.INTEGER,
-    allowNull:false,
-    references:{
-      model:members,
-      key:'id'
-    }
+    allowNull:false
   },
   newspeedId:{
     type:Sequelize.INTEGER,
-    allowNull:false,
-    references:{
-      model:newspeeds,
-      key:'id'
-    }
+    allowNull:false
   },
   content:{
     type:Sequelize.TEXT,

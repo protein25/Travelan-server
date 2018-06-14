@@ -1,31 +1,88 @@
 const express = require('express');
 const Promise = require('bluebird');
 const Sequelize = require('sequelize');
+const multer = require('multer');
 const Op = Sequelize.Op;
 
-const newspeeds = require('../models/newspeeds');
-const travels = require('../models/travels');
-const plans = require('../models/plans');
-const favs = require('../models/favs');
-const images = require('../models/images');
+const Models = require('../models');
+const { Newspeeds, Images, Travels, Plans, Favs } = Models;
 
 const kakaoToken = require('../middlewares/kakaoToken');
+const AWS = require('../utils/aws');
 
 const router = express.Router();
+const Multer = multer();
 
 //모든 게시글 출력
-router.get('/', (req, res, next) => {
+router.get('/', kakaoToken, (req, res, next) => {
+  const { member } = req;
   const pageCount = 10;
   const page = req.query.page || 0;
 
-  newspeeds.scope('addImage', 'addMember')
+  Newspeeds.scope('addImage', 'addMember', 'addTravel')
     .findAll({
       offset: page * pageCount,
       limit: pageCount,
+      order: [['id', 'desc']],
     })
-    .then((result) => {
-      if (!result) throw Error('NO DATA');
-      res.send(result);
+    .then((newspeeds) => {
+      const newspeedIds = newspeeds.map((newspeed) => newspeed.id);
+
+      return [
+        newspeeds,
+        Favs.findAll({
+          where: {
+            memberId: member.id,
+            newspeedId: {
+              [Op.in]: newspeedIds,
+            },
+          },
+        }),
+      ];
+    })
+    .spread((newspeeds, favs) => {
+      if (!newspeeds) throw Error('NO DATA');
+
+      const newspeedFavs = {};
+
+      for(var i in favs) {
+        newspeedFavs[favs[i].newspeedId.toString()] = true;
+      }
+
+      res.send(newspeeds.map((newspeed) => {
+        const result = newspeed.get({ plain: true });
+        const isFav = newspeedFavs[newspeed.id.toString()] ? true : false;
+        result.isFav = isFav;
+
+        return result;
+      }));
+    })
+    .catch(next);
+});
+
+router.post('/', Multer.array("images"), kakaoToken, (req, res, next) => {
+  const { member, files } = req;
+  const { content, travelId } = req.body;
+
+  Promise.map(files, (file) => AWS.s3Upload(file))
+    .then((uploads) => {
+      return Newspeeds.create({
+        memberId: member.id,
+        content,
+        travelId,
+        state: true,
+      })
+      .then((newspeed) => {
+        const images = uploads.map((upload) => {
+          upload.newspeedId = newspeed.id;
+          return upload;
+        });
+
+        return Images.bulkCreate(images);
+      });
+    })
+    .then(() => {
+      res.send({ result: 'success' });
     })
     .catch(next);
 });
@@ -36,7 +93,7 @@ router.get('/search', (req,res,next) => {
   const search =  `%${keyword}%`;
 
   Promise.all([
-    newspeeds.scope('addImage').findAll({
+    Newspeeds.scope('addImage').findAll({
       where: {
         content: {
           [Op.like]: search,
@@ -44,7 +101,7 @@ router.get('/search', (req,res,next) => {
       },
       order: [['createdAt', 'desc']],
     }),
-    travels.findAll({
+    Travels.findAll({
       attributes: ['id'],
       where: {
         title: {
@@ -54,9 +111,9 @@ router.get('/search', (req,res,next) => {
     })
     .then((results) => {
       const travelIds = results.map((travel) => travel.id);
-      return newspeeds.scope('addImage').findAll({
+      return Newspeeds.scope('addImage').findAll({
         include: [{
-          model: plans,
+          model: Plans,
           where: {
             titleId: {
               [Op.in]: travelIds,
@@ -103,7 +160,7 @@ router.get('/search', (req,res,next) => {
 router.get('/showPlan/:id([0-9]+)', (req,res,next) => {
   var titleId = req.params.id;
 
-  plans.findAll({
+  Plans.findAll({
     where:{
       titleId,
     }
@@ -116,58 +173,33 @@ router.get('/showPlan/:id([0-9]+)', (req,res,next) => {
 });
 
 //즐겨찾기 추가하기
-router.post('/addFavs', kakaoToken, (req,res,next) => {
+router.post('/addFav', kakaoToken, (req,res,next) => {
   const { member } = req;
   const { newspeedId } = req.body;
 
-  favs.create({
+  Favs.create({
     memberId: member.id,
-    newspeedId: newspeedId
+    newspeedId,
   }).then((result) => {
     res.send(result);
   }).catch(next);
 });
 
 //즐겨찾기 삭제하기
-router.post('/delFavs', kakaoToken, (req,res,next) => {
+router.post('/delFav', kakaoToken, (req,res,next) => {
   const { member } = req;
   const { newspeedId } = req.body;
 
-  favs.destroy({
+  Favs.destroy({
     where:{
       memberId: member.id,
       newspeedId,
     },
   })
   .then(() => {
-    res.send('success');
+    res.send({ result: 'success' });
   })
   .catch(next)
-  });
-
-//newsfeed 작성하기
-//imageUrl 수정하기
-router.post('/write', kakaoToken, (req,res,next) => {
-  const { member } = req;
-  const { content, planId, imageUrl } = req.body;
-
-  newspeeds.create({
-    memberId: member.id,
-    content,
-    planId,
-    state: true,
-  })
-  .then((result) => {
-    return images.create({
-      newspeedId: result.id,
-      originName: imageUrl,
-      serverName: 'dummydata'
-    });
-  })
-  .then(() => {
-    res.send('success');
-  })
-  .catch(next);
 });
 
 //내가 쓴 newspeed 삭제하기 state:1->true, 0->false
@@ -175,7 +207,7 @@ router.post('/delete', kakaoToken, (req,res,next) => {
   const { member } = req;
   const { newspeedId } = req.body;
 
-  newspeeds.findById(newspeedId)
+  Newspeeds.findById(newspeedId)
     .then((result) => {
       if (result.memberId !== member.id) {
         throw new Error('본인이 작성한 글만 삭제할 수 있습니다.');
@@ -195,11 +227,10 @@ router.post('/edit', kakaoToken, (req,res,next) => {
   const { member } = req;
   const { newspeedId , content } = req.body;
 
-
-  newspeeds.findById(newspeedId)
+  Newspeeds.findById(newspeedId)
     .then((result) => {
       if (result.memberId !== member.id) {
-        throw new Error('본인지 작성한 글만 수정할 수 있습니다.');
+        throw new Error('본인이 작성한 글만 수정할 수 있습니다.');
       }
 
       return result.update({ content });

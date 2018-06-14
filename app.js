@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cron = require('node-cron');
 
+const modelAssociate = require('./models');
+
 const indexRouter = require('./routes/index');
 const informationsRouter = require('./routes/informations');
 const usersRouter = require('./routes/users');
