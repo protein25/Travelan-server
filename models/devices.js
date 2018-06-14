@@ -5,11 +5,11 @@ const devices = sequelize.define('devices',{
   memberId:{
     type:Sequelize.INTEGER
   },
-  deviceId:{
+  mac:{
     type:Sequelize.STRING
   },
   lastLocation:{
-    type:Sequelize.STRING
+    type:Sequelize.GEOMETRY('POINT'),
   }
 });
 

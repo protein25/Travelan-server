@@ -15,6 +15,7 @@ const newspeedRouter = require('./routes/newspeed');
 const commentRouter = require('./routes/comment');
 const planRouter = require('./routes/plan');
 const travelRouter = require('./routes/travel');
+const deviceRouter = require('./routes/device');
 
 const informationCrawl = require('./informationCrawl');
 
@@ -38,6 +39,7 @@ app.use('/informations',informationsRouter);
 app.use('/comment',commentRouter);
 app.use('/plan',planRouter);
 app.use('/travel',travelRouter);
+app.use('/device',deviceRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
