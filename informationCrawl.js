@@ -5,7 +5,7 @@ const informations = require('./models/informations');
 
 const entities = new Html4Entities();
 
-function crawl(targetId, pageNo = 1, foundCount = 0) {
+function crawl(targetId, pageNo = 1, foundIds = {}) {
   let findTarget = false;
 
   return informationCrawler(pageNo)
@@ -15,11 +15,11 @@ function crawl(targetId, pageNo = 1, foundCount = 0) {
         return;
       }
 
-      if (findTarget) {
+      if (findTarget || foundIds[result.id[0]]) {
         return;
       }
 
-      foundCount += 1;
+      foundIds[result.id[0]] = true;
 
       return informations.create({
         dataId: result.id[0],
@@ -32,8 +32,8 @@ function crawl(targetId, pageNo = 1, foundCount = 0) {
       });
     }))
     .then(() => {
-      if (findTarget) return foundCount;
-      return crawl(targetId, pageNo + 1, foundCount);
+      if (findTarget) return Object.keys(foundIds).length;
+      return crawl(targetId, pageNo + 1, foundIds);
     });
 }
 
