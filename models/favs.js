@@ -6,19 +6,11 @@ var newspeeds = require('./newspeeds');
 const favs = sequelize.define('favs',{
   memberId:{
     type:Sequelize.INTEGER,
-    allowNull:false,
-    references:{
-      model:members,
-      key:'id'
-    }
+    allowNull:false
   },
   newspeedId:{
     type:Sequelize.INTEGER,
-    allowNull:false,
-    references:{
-      model:newspeeds,
-      key:'id'
-    }
+    allowNull:false
   }
 });
 

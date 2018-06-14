@@ -1,43 +1,49 @@
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
-var members = require('./members');
-var images = require('./images');
-var plans = require('./plans');
+const Models = () => require('./index');
 
 const options = {
+  defaultScope: {
+    where: {
+      state: true,
+    },
+    order: [['id', 'desc']],
+  },
   scopes: {
-    addImage: () => ({
-      where: {
-        state: 1,
-      },
-      include:[{
-        model:images,
-          where:{
-            newspeedId:Sequelize.col('newspeed.id'),
-          },
-      }],
-    }),
+    addImage: () => {
+      return {
+        where: {
+          state: 1,
+        },
+        include:[{
+          model: Models().Images,
+          required: true,
+        }],
+      };
+    },
     addMember: () => ({
       include: [{
-        model: members,
+        model: Models().Members,
+      }]
+    }),
+    addTravel: () => ({
+      include: [{
+        model: Models().Travels,
+        required: true,
       }]
     })
   },
 };
 
-const newspeed = sequelize.define('newspeed', {
+const newspeeds = sequelize.define('newspeeds', {
   memberId: {
     type:Sequelize.STRING,
     allowNull:false,
-    references:{
-      model:members,
-      key:'id'
-    }
   },
   content: {
     type:Sequelize.TEXT
   },
-  planId: {
+  travelId: {
     type:Sequelize.INTEGER
   },
   state: {
@@ -46,8 +52,4 @@ const newspeed = sequelize.define('newspeed', {
   }
 }, options);
 
-newspeed.hasMany(images);
-newspeed.belongsTo(plans);
-newspeed.belongsTo(members);
-
-module.exports = newspeed;
+module.exports = newspeeds;

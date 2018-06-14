@@ -13,11 +13,11 @@ router.get('/:id([0-9]+)', (req, res, next) => {
       newspeedId:newspeedId
     }
   })
-    .then((result) => {
-      if (!result) throw Error('NO COMMENT');
-      res.send(result);
-    })
-    .catch(next);
+  .then((result) => {
+    if (!result) throw Error('NO COMMENT');
+    res.send(result);
+  })
+  .catch(next);
 });
 
 //댓글 작성
