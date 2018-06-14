@@ -26,6 +26,9 @@ Newspeeds.belongsTo(Members);
 Newspeeds.hasMany(Comments);
 Comments.belongsTo(Newspeeds);
 
+Newspeeds.hasMany(Favs);
+Favs.belongsTo(Newspeeds);
+
 Members.hasMany(Comments);
 Comments.belongsTo(Members);
 

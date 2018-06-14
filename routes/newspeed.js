@@ -16,42 +16,28 @@ const Multer = multer();
 //모든 게시글 출력
 router.get('/', kakaoToken, (req, res, next) => {
   const { member } = req;
+  const { mypage } = req.query;
+
   const pageCount = 10;
   const page = req.query.page || 0;
 
   Newspeeds.scope('addImage', 'addMember', 'addTravel')
     .findAll({
+      include: [{
+        model: Favs,
+        where: {
+          memberId: member.id,
+        },
+        required: mypage ? true : false,
+      }],
       offset: page * pageCount,
       limit: pageCount,
       order: [['id', 'desc']],
     })
     .then((newspeeds) => {
-      const newspeedIds = newspeeds.map((newspeed) => newspeed.id);
-
-      return [
-        newspeeds,
-        Favs.findAll({
-          where: {
-            memberId: member.id,
-            newspeedId: {
-              [Op.in]: newspeedIds,
-            },
-          },
-        }),
-      ];
-    })
-    .spread((newspeeds, favs) => {
-      if (!newspeeds) throw Error('NO DATA');
-
-      const newspeedFavs = {};
-
-      for(var i in favs) {
-        newspeedFavs[favs[i].newspeedId.toString()] = true;
-      }
-
       res.send(newspeeds.map((newspeed) => {
         const result = newspeed.get({ plain: true });
-        const isFav = newspeedFavs[newspeed.id.toString()] ? true : false;
+        const isFav = result.favs.length > 0 ? true : false;
         result.isFav = isFav;
 
         return result;

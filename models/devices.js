@@ -6,7 +6,16 @@ const devices = sequelize.define('devices',{
     type:Sequelize.INTEGER
   },
   mac:{
-    type:Sequelize.STRING
+    type: Sequelize.STRING,
+  },
+  name: {
+    type: Sequelize.STRING,
+  },
+  imageUrl: {
+    type: Sequelize.STRING,
+  },
+  isReported: {
+    type: Sequelize.BOOLEAN,
   },
   lastLocation:{
     type:Sequelize.GEOMETRY('POINT'),

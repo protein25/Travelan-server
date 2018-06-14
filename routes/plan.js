@@ -64,6 +64,7 @@ router.post('/write', kakaoToken, (req,res,next) => {
   const {
     sort, date, travelId, title, address, origin,
     destination, way, route, time, order,
+    lat, lng,
   } = req.body;
 
   Promise.resolve()
@@ -72,12 +73,20 @@ router.post('/write', kakaoToken, (req,res,next) => {
         return accommodates.create({
           title,
           address,
+          coordinates: {
+            type: 'Point',
+            coordinates: [lng, lat]
+          },
         });
       }
       if (sort === 'attraction') {
         return attractions.create({
           title,
           address,
+          coordinates: {
+            type: 'Point',
+            coordinates: [lng, lat]
+          },
         });
       }
       if (sort === 'transportation') {
