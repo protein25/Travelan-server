@@ -5,11 +5,20 @@ const devices = sequelize.define('devices',{
   memberId:{
     type:Sequelize.INTEGER
   },
-  deviceId:{
-    type:Sequelize.STRING
+  mac:{
+    type: Sequelize.STRING,
+  },
+  name: {
+    type: Sequelize.STRING,
+  },
+  imageUrl: {
+    type: Sequelize.STRING,
+  },
+  isReported: {
+    type: Sequelize.BOOLEAN,
   },
   lastLocation:{
-    type:Sequelize.STRING
+    type:Sequelize.GEOMETRY('POINT'),
   }
 });
 
