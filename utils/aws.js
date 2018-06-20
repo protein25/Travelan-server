@@ -5,8 +5,8 @@ const moment = require('moment');
 const url = require('url');
 
 AWS.config.update({
-  accessKeyId: 'AKIAJMVT7D3EPQQXEYYA',
-  secretAccessKey: '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',
+  accessKeyId: 'AKIAIMKFMG34BNH42VVA',
+  secretAccessKey: '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',
   region: 'ap-northeast-2',
 });
 
@@ -17,7 +17,7 @@ module.exports = {
     const { originalname, buffer, mimetype } = file;
     const Key = `${moment().valueOf()}_${originalname}`;
     const param = {
-        Bucket: 'travelan',
+        Bucket: 'travelan-images',
         Key,
         ACL: 'public-read',
         Body: buffer,

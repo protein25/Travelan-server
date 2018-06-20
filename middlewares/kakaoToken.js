@@ -8,7 +8,7 @@ module.exports = (req, res, next) => {
   const accessToken = req.get('access-token');
 
   if (req.query.test) {
-    return members.findById(9)
+    return members.findById(1)
       .then((member) => {
         req.member = member;
         next();
