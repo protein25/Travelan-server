@@ -1,3 +1,4 @@
+const moment = require('moment');
 const Sequelize = require('sequelize');
 const sequelize = require('./database');
 
@@ -12,6 +13,9 @@ const plans = sequelize.define('plans',{
   },
   date:{
     type: Sequelize.DATE,
+    get() {
+      return moment(this.getDataValue('date'));
+    },
   },
   attributeType:{
     type:Sequelize.ENUM(['accomodate','attraction','transportation']),

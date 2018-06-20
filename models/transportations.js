@@ -2,21 +2,27 @@ const Sequelize = require('sequelize');
 const sequelize = require('./database');
 
 const transportations = sequelize.define('transportations',{
-  origin:{
+  origin: {
     type:Sequelize.STRING
   },
-  destination:{
+  originCoordinates: {
+    type: Sequelize.GEOMETRY('POINT'),
+  },
+  destination: {
     type:Sequelize.STRING
   },
-  way:{
+  destinationCoordinates: {
+    type: Sequelize.GEOMETRY('POINT'),
+  },
+  time: {
     type:Sequelize.STRING
   },
-  time:{
-    type:Sequelize.STRING
-  },
-  route:{
+  route: {
     type:Sequelize.TEXT
-  }
+  },
+  polyline: {
+    type: Sequelize.GEOMETRY('LINESTRING'),
+  },
 });
 
 module.exports = transportations;

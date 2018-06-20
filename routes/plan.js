@@ -62,9 +62,9 @@ router.post('/write', kakaoToken, (req,res,next) => {
   const { member } = req;
 
   const {
-    sort, date, travelId, title, address, origin,
-    destination, way, route, time, order,
-    lat, lng,
+    sort, date, travelId, title, address, origin, originLat, originLng,
+    destination, destinationLat, destinationLng, way, route, time, order,
+    lat, lng, polyline,
   } = req.body;
 
   Promise.resolve()
@@ -90,11 +90,25 @@ router.post('/write', kakaoToken, (req,res,next) => {
         });
       }
       if (sort === 'transportation') {
+        const polylineArray = JSON.parse(polyline);
+        const polylineGeo = polylineArray.map((geo) => [geo.lng, geo.lat]);
         return transportations.create({
           origin,
+          originCoordinates: {
+            type: 'Point',
+            coordinates: [originLng, originLat]
+          },
           destination,
+          destinationCoordinates: {
+            type: 'Point',
+            coordinates: [destinationLng, destinationLat],
+          },
           way,
           route,
+          polyline: {
+            type: 'LineString',
+            coordinates: polylineGeo,
+          },
           time
         });
       }
@@ -124,5 +138,15 @@ router.get("/findLocation", (req, res, next) => {
     })
     .catch(next);
 });
+
+router.get("/findRoute", (req, res, next) => {
+  const { originLat, originLng, destinationLat, destinationLng } = req.query;
+
+  GoogleApi.direction({ lat: originLat, lng: originLng }, { lat: destinationLat, lng: destinationLng })
+    .then((results) => {
+      res.send(results);
+    })
+    .catch(next);
+})
 
 module.exports = router;
